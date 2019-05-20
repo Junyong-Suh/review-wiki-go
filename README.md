@@ -5,13 +5,14 @@ Wiki service in Go from [https://golang.org/doc/articles/wiki/](https://golang.o
 ## Requirements
 * Go 1.12.5 or higher
 
-## Install
+## Setup
 ```
 $ git clone git@github.com:Junyong-Suh/review-wiki-go.git
+$ cd review-wiki-go
 $ go mod tidy
 ```
 
-## Run
+## Build & Run
 ```
 $ go build .
 $ go run .
@@ -48,4 +49,4 @@ Renders an article in edit mode. Create if none exists.
 
 Try open up from <span style="color:brown">*browser*</span>.
 
-Saves an article. 
+Saves an article.
