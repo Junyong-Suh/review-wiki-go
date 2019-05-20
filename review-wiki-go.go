@@ -107,5 +107,6 @@ func main() {
     http.HandleFunc("/view/", viewHandler)
     http.HandleFunc("/edit/", editHandler)
     http.HandleFunc("/save/", saveHandler)
+    log.Println("review-wiki-go is running on port 8080")
     log.Fatal(http.ListenAndServe(":8080", nil))
 }
