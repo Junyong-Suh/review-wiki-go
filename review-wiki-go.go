@@ -10,37 +10,12 @@ import (
     "os/signal"
     "context"
     "net/http"
-    "html/template"
-    "regexp"
     "errors"
 
+    u "github.com/Junyong-Suh/review-wiki-go/utils"
+    h "github.com/Junyong-Suh/review-wiki-go/handlers"
     "github.com/gorilla/mux"
 )
-
-func loadPage(title string) (*Page, error) {
-    filename := title + ".txt"
-    body, err := ioutil.ReadFile(filename)
-    if err != nil {
-        return nil, err
-    }
-    return &Page{Title: title, Body: body}, nil
-}
-
-func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-    err := templates.ExecuteTemplate(w, tmpl+".html", p)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-    }
-}
-
-func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
-    m := validPath.FindStringSubmatch(r.URL.Path)
-    if m == nil {
-        http.NotFound(w, r)
-        return "", errors.New("Invalid Page Title")
-    }
-    return m[2], nil // The title is the second subexpression.
-}
 
 // func main() {
 //     p1 := &Page{Title: "TestPage", Body: []byte("This is a sample Page.")}
@@ -51,19 +26,6 @@ func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
 
 func handler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-}
-
-func viewHandler(w http.ResponseWriter, r *http.Request) {
-    title, err := getTitle(w, r)
-    if err != nil {
-        return
-    }
-    p, err := loadPage(title)
-    if err != nil {
-        http.Redirect(w, r, "/edit/"+title, http.StatusFound)
-        return
-    }
-    renderTemplate(w, "view", p)
 }
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +41,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
-    title, err := getTitle(w, r)
+    title, err := u.getTitle(w, r)
     if err != nil {
         return
     }
@@ -93,9 +55,6 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
     http.Redirect(w, r, "/view/"+title, http.StatusFound)
 }
 
-var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
-var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
-
 func main() {
     var wait time.Duration
     flag.DurationVar(&wait, "graceful-timeout", time.Second * 15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
@@ -103,7 +62,7 @@ func main() {
 
     r := mux.NewRouter()
     r.HandleFunc("/", handler)
-    r.HandleFunc("/view/", viewHandler)
+    r.HandleFunc("/view/", h.viewHandler)
     r.HandleFunc("/edit/", editHandler)
     r.HandleFunc("/save/", saveHandler)
 
