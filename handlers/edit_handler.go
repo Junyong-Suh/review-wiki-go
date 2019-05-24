@@ -6,15 +6,14 @@ import (
     u "github.com/Junyong-Suh/review-wiki-go/utils"
 )
 
-func ViewHandler(w http.ResponseWriter, r *http.Request) {
+func EditHandler(w http.ResponseWriter, r *http.Request) {
     title, err := u.GetTitle(w, r)
     if err != nil {
         return
     }
     p, err := u.LoadPage(title)
     if err != nil {
-        http.Redirect(w, r, "/edit/"+title, http.StatusFound)
-        return
+        p = &u.Page{Title: title}
     }
-    u.RenderTemplate(w, "view", p)
+    u.RenderTemplate(w, "edit", p)
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-    "io/ioutil"
     "fmt"
     "flag"
     "log"
@@ -10,50 +9,18 @@ import (
     "os/signal"
     "context"
     "net/http"
-    "errors"
 
-    u "github.com/Junyong-Suh/review-wiki-go/utils"
     h "github.com/Junyong-Suh/review-wiki-go/handlers"
+
     "github.com/gorilla/mux"
 )
 
 // func main() {
 //     p1 := &Page{Title: "TestPage", Body: []byte("This is a sample Page.")}
 //     p1.save()
-//     p2, _ := loadPage("TestPage")
+//     p2, _ := LoadPage("TestPage")
 //     fmt.Println(string(p2.Body))
 // }
-
-func handler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-}
-
-func editHandler(w http.ResponseWriter, r *http.Request) {
-    title, err := getTitle(w, r)
-    if err != nil {
-        return
-    }
-    p, err := loadPage(title)
-    if err != nil {
-        p = &Page{Title: title}
-    }
-    renderTemplate(w, "edit", p)
-}
-
-func saveHandler(w http.ResponseWriter, r *http.Request) {
-    title, err := u.getTitle(w, r)
-    if err != nil {
-        return
-    }
-    body := r.FormValue("body")
-    p := &Page{Title: title, Body: []byte(body)}
-    err = p.save()
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-    http.Redirect(w, r, "/view/"+title, http.StatusFound)
-}
 
 func main() {
     var wait time.Duration
@@ -61,10 +28,10 @@ func main() {
     flag.Parse()
 
     r := mux.NewRouter()
-    r.HandleFunc("/", handler)
-    r.HandleFunc("/view/", h.viewHandler)
-    r.HandleFunc("/edit/", editHandler)
-    r.HandleFunc("/save/", saveHandler)
+    r.HandleFunc("/", h.RootHandler)
+    r.HandleFunc("/view/", h.ViewHandler)
+    r.HandleFunc("/edit/", h.EditHandler)
+    r.HandleFunc("/save/", h.SaveHandler)
 
     port := "8080"
     srv := &http.Server{
