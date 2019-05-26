@@ -15,7 +15,7 @@ type Page struct {
 
 func (p *Page) Save() error {
     // update Page to have proper unique filename to store as txt
-    filename := p.Title + ".txt"
+    filename := "./data/" + p.Title + ".txt"
 
     // The octal integer literal 0600 indicates that the file should be created with read-write permissions for the current user only.
     return ioutil.WriteFile(filename, p.Body, 0600)
@@ -25,7 +25,7 @@ var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
 
 func LoadPage(title string) (*Page, error) {
-    filename := title + ".txt"
+    filename := "./data/" + title + ".txt"
     body, err := ioutil.ReadFile(filename)
     if err != nil {
         return nil, err
