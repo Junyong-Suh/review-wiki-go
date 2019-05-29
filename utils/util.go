@@ -22,7 +22,7 @@ func (p *Page) Save() error {
 }
 
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
-var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+var templates = template.Must(template.ParseFiles("./templates/edit.html", "./templates/view.html"))
 
 func LoadPage(title string) (*Page, error) {
     filename := "./data/" + title + ".txt"
